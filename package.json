@@ -1,0 +1,21 @@
+{
+  "name": "demo-tipping-frontier",
+  "engines": {
+    "node": "18.x"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "parcel build src/slidy.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "parcel src/slidy.html --no-cache",
+    "start": "parcel serve src/slidy.html --public-url / --dist-dir dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@parcel/transformer-sass": "^2.8.0",
+    "chart.js": "^4.0.1",
+    "parcel": "^2.6.2"
+  }
+}

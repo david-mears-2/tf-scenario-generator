@@ -1,0 +1,21 @@
+body {
+  color: rgb(0, 11, 74) !important;
+}
+
+.bg-teal {
+  background-color: lightblue;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+h4 {
+  margin-bottom: 1rem !important;
+}
+
+.nav-tabs .nav-link {
+  color: unset;
+}

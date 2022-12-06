@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scenario Generator</title>
+    <link rel="stylesheet" href="scss/custom.scss" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+  <body>
+    <!-- <div style="width: 500px;"><canvas id="dimensions"></canvas></div><br/> -->
+    <!-- <div style="width: 800px;"><canvas id="acquisitions"></canvas></div> -->
+    <div class="container-fluid">
+      <h2 class="text-center mt-2">Scenario generator</h2>
+      <div class="row mt-2 border-top">
+        <div class="col-3">
+          <div id="scenarios" class="rounded border mx-2 my-3 py-3 px-2 bg-teal">
+            <h4>Scenario</h4>
+            <div class="form-group">
+              <label class="form-label fw-bold" for="hazard">Hazard</label>
+              <select id="hazard" class="form-select">
+                <option selected value="cyclone">Cyclone</option>
+                <option value="drought">Drought</option>
+                <option value="flood">Flood</option>
+                <option value="wildfire">Wildfire</option>
+                <option value="heatwave">Heatwave</option>
+              </select>
+            </div>
+            <div class="form-group mt-5">
+              <label class="form-label fw-bold" for="intensity">Intensity</label>
+              <p id="intensityReadout" class="text-center text-secondary mb-0">placeholder-year event</p>
+              <input class="form-range" type="range" id="intensity" name="intensity" min="1" max="5" step="1" value="1">
+            </div>
+            <!-- backend: just use this number to multiply the data points? -->
+            <!-- 1: 5-year event -->
+            <!-- 2: 10-year event -->
+            <!-- 3: 20-year event -->
+            <!-- 4: 50-year event -->
+            <!-- 5: 100-year event -->
+
+            <div class="form-group mt-5">
+              <label class="form-label fw-bold" for="regions">Region(s)</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Barishal">
+                <label class="form-check-label" for="Barishal">
+                  Barishal
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Chattogram">
+                <label class="form-check-label" for="Chattogram">
+                  Chattogram
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Dhaka">
+                <label class="form-check-label" for="Dhaka">
+                  Dhaka
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Khulna">
+                <label class="form-check-label" for="Khulna">
+                  Khulna
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Rajshahi">
+                <label class="form-check-label" for="Rajshahi">
+                  Rajshahi
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Rangpur">
+                <label class="form-check-label" for="Rangpur">
+                  Rangpur
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Mymensingh">
+                <label class="form-check-label" for="Mymensingh">
+                  Mymensingh
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" value="" id="Sylhet">
+                <label class="form-check-label" for="Sylhet">
+                  Sylhet
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-9">
+          <div id="assumptions" class="rounded border my-3 py-3 px-2 bg-teal">
+            <h4>Economic assumptions</h4>
+            <form class="row">
+              <div class="col form-group">
+                <label class="form-label fw-bold" for="household">Household (asset disposal)</label>
+                <select id="household" class="form-select">
+                  <option value="-35">35% fall</option>
+                  <option value="-30">30% fall</option>
+                  <option value="-25">25% fall</option>
+                  <option value="-20">20% fall</option>
+                  <option value="-15">15% fall</option>
+                  <option value="-10">10% fall</option>
+                  <option value="-5">5% fall</option>
+                  <option selected value="0">No increase</option>
+                  <option value="5">5% increase</option>
+                  <option value="10">10% increase</option>
+                  <option value="15">15% increase</option>
+                  <option value="20">20% increase</option>
+                  <option value="25">25% increase</option>
+                  <option value="30">30% increase</option>
+                  <option value="35">35% increase</option>
+                </select>
+              </div>
+
+              <div class="col form-group">
+                <label class="form-label fw-bold" for="firm">Firm (investment)</label>
+                <select id="firm" class="form-select">
+                  <option value="-35">35% fall</option>
+                  <option value="-30">30% fall</option>
+                  <option value="-25">25% fall</option>
+                  <option value="-20">20% fall</option>
+                  <option value="-15">15% fall</option>
+                  <option value="-10">10% fall</option>
+                  <option value="-5">5% fall</option>
+                  <option selected value="0">No increase</option>
+                  <option value="5">5% increase</option>
+                  <option value="10">10% increase</option>
+                  <option value="15">15% increase</option>
+                  <option value="20">20% increase</option>
+                  <option value="25">25% increase</option>
+                  <option value="30">30% increase</option>
+                  <option value="35">35% increase</option>
+                </select>
+              </div>
+
+              <div class="col form-group">
+                <label class="form-label fw-bold" for="bank">Monetary policy</label>
+                <select id="bank" class="form-select">
+                  <option value="-3">Very contractionary</option>
+                  <option value="-2">Contractionary</option>
+                  <option selected value="-1">Slightly contractionary</option>
+                  <option value="1">Slightly expansionary</option>
+                  <option value="2">Expansionary</option>
+                  <option value="3">Very expansionary</option>
+                </select>
+              </div>
+
+              <div class="col form-group">
+                <label class="form-label fw-bold" for="gov">Fiscal policy</label>
+                <select id="gov" class="form-select">
+                  <option value="-3">Very contractionary</option>
+                  <option value="-2">Contractionary</option>
+                  <option selected value="-1">Slightly contractionary</option>
+                  <option value="1">Slightly expansionary</option>
+                  <option value="2">Expansionary</option>
+                  <option value="3">Very expansionary</option>
+                </select>
+              </div>
+              
+            </form>
+          </div>
+
+          <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth-tab-pane" type="button" role="tab" aria-controls="growth-tab-pane" aria-selected="true">Projected GDP growth</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="gdp-tab" data-bs-toggle="tab" data-bs-target="#gdp-tab-pane" type="button" role="tab" aria-controls="gdp-tab-pane" aria-selected="false">GDP</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="debt-tab" data-bs-toggle="tab" data-bs-target="#debt-tab-pane" type="button" role="tab" aria-controls="debt-tab-pane" aria-selected="false">Debt</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="deficit-tab" data-bs-toggle="tab" data-bs-target="#deficit-tab-pane" type="button" role="tab" aria-controls="deficit-tab-pane" aria-selected="false">Budget deficit</button>
+            </li>
+          </ul>          
+          <canvas id="myChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module" src="js/slidy.js"></script>
+
+    <!-- <script type="module" src="dimensions.js"></script> -->
+    <!-- <script type="module" src="acquisitions.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script> -->
+  </body>
+</html>
+
+
+
+
+ 
