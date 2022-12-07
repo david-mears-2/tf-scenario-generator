@@ -19,3 +19,13 @@ h4 {
 .nav-tabs .nav-link {
   color: unset;
 }
+
+.bangladesh {
+  height: 300px;
+  vertical-align: unset;
+  display: none;
+
+  @media (min-height: 1000px) {
+    display: block;
+  }
+}

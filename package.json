@@ -13,10 +13,10 @@
     }
   },
   "scripts": {
-    "build": "parcel build src/slidy.html",
+    "build": "parcel build src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel src/slidy.html --no-cache",
-    "start": "parcel serve src/slidy.html --public-url / --dist-dir dist"
+    "dev": "parcel src/index.html --no-cache",
+    "start": "parcel serve src/index.html --public-url / --dist-dir dist"
   },
   "author": "",
   "license": "ISC",

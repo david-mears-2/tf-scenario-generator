@@ -82,7 +82,7 @@ const regions = [
   },
   {
     name: 'Sylhet',
-    color: 'rgb(150, 75, 0)',
+    color: 'rgb(30, 30, 30)',
     startingValues: {
       gdp: (9798000/bangladeshPop) * bangladeshGDP2022,
       growth: -6,
@@ -109,7 +109,7 @@ const graphs = [
     shape: [1, 0.9, 0.92, 0.93, 0.935, 0.94, 0.95, 0.958, 0.963, 0.97, 0.973]
   },
   { // Since this is expressed as a percent of GDP, to be internally consistent, I am writing
-    // out the absolute debt figure, which we will later calculate as a percent of GDP. TODO
+    // out the absolute debt figure, which we will later calculate as a percent of GDP.
     title: 'Debt (% GDP)',
     id: 'debt',
     unit: '%',
@@ -143,7 +143,7 @@ const graphs = [
 //   }
 // }
 let dataSource = {}
-// Cycle through graphs before regions, since (eventually) Debt values will depend on earlier GDP values
+// Cycle through graphs before regions, since debt values depend on earlier GDP values
 graphs.forEach((graph) => {
   regions.forEach((region) => {
     
@@ -163,15 +163,25 @@ graphs.forEach((graph) => {
       // Scale each step in the 'graph shape' time series by the starting value
       // Add in some randomization so that regions/hazards have slightly different shapes from each other
       timeSeries = graph.shape.map((item) => perturb(item * startingValue))
-      // TODO: the random noise should include some 'memory' of the previous item, to be more realistic.
+      
+      // If the graph in q is debt, we now need to convert the absolute debt into a percent of GDP
+      if (graph.id.includes('debt')) {
+        gdpTimeSeries = dataSource[region.name]['gdp'][hazard]
+        timeSeries = timeSeries.map((absoluteDebt, i) => {
+          const gdpAtThisTimeStep = gdpTimeSeries[i]
+          const debtAsProportionOfGDP = (absoluteDebt/gdpAtThisTimeStep) * 100
+          console.log(absoluteDebt, debtAsProportionOfGDP)
+          return debtAsProportionOfGDP
+        })
+      }
+      
       dataSource[region.name][graph.id][hazard] = timeSeries
-      // TODO: If the graph in q is debt, we now need to convert the absolute debt into a percent of GDP
     })
   })
 })
 
 function perturb(num) {
-  return getRandomFloat(0.6, 1.4, 2) * num
+  return getRandomFloat(0.7, 1.4, 2) * num
 }
 function getRandomFloat(min, max, decimals) {
   const str = (Math.random() * (max - min) + min).toFixed(decimals);
@@ -195,29 +205,6 @@ tabs.forEach((tab) => {
     refreshChart()
   })
 })
-
-// function removeData(chart) {
-//   chart.data.labels.pop();
-//   chart.data.datasets.forEach((dataset) => {
-//       dataset.data.pop();
-//   });
-//   chart.update()
-// }
-
-// We'll need four charts eventually:
-// {
-//   label: 'GDP ($ trillion)',
-//   data: [],
-//   borderWidth: 1
-// },{
-//   label: 'Debt (% GDP)',
-//   data: [],
-//   borderWidth: 1
-// },{
-//   label: 'Budget deficit ($ trillion)',
-//   data: [],
-//   borderWidth: 1
-// }
 
 const years = ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032']
 Chart.defaults.elements.line.tension = 0.1;
@@ -244,6 +231,8 @@ var config = {
         },
       },
     },
+    maintainAspectRatio: false,
+    responsive: true,
     scales: {
       y: {
         beginAtZero: true,
@@ -280,6 +269,15 @@ const govReadout = document.getElementById('govReadout')
 const govInput = document.getElementById('gov')
 
 
+// Household selling assets is bad, firm investment is good, contractionary is bad, and expansionary is good.
+// Set an amount by which to damage the economy (with a 'noise factor') for each year, e.g. '0.2' means 'scale by 120%'
+const householdOrFirmBasic = [-35, -30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30, 35]
+const householdPerturbations = householdOrFirmBasic.map((n) => perturb(0 - (n/100)))
+const firmPerturbations = householdOrFirmBasic.map((n) => perturb(n/100))
+const bankOrGovBasic = [-3, -2, -1, 0, 1, 2, 3]
+const bankPerturbations = bankOrGovBasic.map((n) => perturb(n/100))
+const govPerturbations = bankOrGovBasic.map((n) => perturb(n/100))
+
 const intensities = {
   "1": "5",
   "2": "10",
@@ -291,7 +289,7 @@ const policies = {
   "-3": "Very contractionary",
   "-2": "Contractionary",
   "-1": "Slightly contractionary",
-  "0": "No change",
+  "0": "Average", // TODO: or 'no change'?
   "1": "Slightly expansionary",
   "2": "Expansionary",
   "3": "Very expansionary"
@@ -376,6 +374,7 @@ function getDataToDisplay() {
   let dataToDisplay = {}
   // check which output to display
   const activeTabId = getActiveTabId()
+  const currentGraphIsCorrelatedWithGoodEconomy = activeTabId.includes('growth') || activeTabId.includes('gdp')
   // check which hazard
   const activeHazard = getActiveHazard()
   // check which regions to display
@@ -389,20 +388,58 @@ function getDataToDisplay() {
       dataToDisplay[activeRegion][activeTabId] = {}
     }
     let timeSeries = dataSource[activeRegion][activeTabId][activeHazard]
-    // Scale the data by the intensity factor
-    // Actually, that should happen inside a shared function, since it needs to be
-    // called when we click on ANY input.
-    const intensity = intensityInput.value
-    timeSeries = timeSeries.map((item, i) => {
-      // apply intensity factor more in earlier years than later
-      return item * (intensity/(i+1))
-    })
-      // scale by other things
+    if (numbersMayBeNegative()) {
 
+      // Get a feel for the orders of magnitude we're working with
+      const meanData = absMean(timeSeries)
 
+      timeSeries = timeSeries.map((item, index) => {
+
+      
+        // For graphs that can pass the zero mark, don't multiply these, but rather add them as constant
+        // influence per year, so that values near 0 in later years are able to drift away from 0 (in either direction)
+        const annualIntensityInfluence = (intensityInput.value * meanData) / 10
+        const annualHouseholdInfluence = householdPerturbations[householdOrFirmBasic.indexOf(parseInt(householdInput.value))] * meanData
+        const annualFirmInfluence = firmPerturbations[householdOrFirmBasic.indexOf(parseInt(firmInput.value))] * meanData
+        const annualBankInfluence = bankPerturbations[bankOrGovBasic.indexOf(parseInt(bankInput.value))] * meanData
+        const annualGovInfluence = govPerturbations[bankOrGovBasic.indexOf(parseInt(govInput.value))] * meanData
+        const totalInfluence = annualIntensityInfluence + annualHouseholdInfluence + annualFirmInfluence + annualBankInfluence + annualGovInfluence
+
+        if (currentGraphIsCorrelatedWithGoodEconomy) {
+          item += ((index + 1) * totalInfluence)
+        } else {
+          item -= ((index + 1) * totalInfluence)
+        }
+        const valueCannotGoBelowNegative100 = activeTabId === 'growth'
+        return valueCannotGoBelowNegative100 && item < -100 ? -90 : item
+      })
+    } else {
+      // For graphs that can't pass the zero mark by definition, apply scaling factors (multiply).
+      timeSeries = timeSeries.map((item, index) => { 
+        const annualIntensityScalar = [1.07, 1.13, 1.2, 1.3, 1.5][parseInt(intensityInput.value) - 1]
+        const annualHouseholdScalar = 1 + householdPerturbations[householdOrFirmBasic.indexOf(parseInt(householdInput.value))]
+        const annualFirmScalar = 1 + firmPerturbations[householdOrFirmBasic.indexOf(parseInt(firmInput.value))]
+        const annualBankScalar = 1 + bankPerturbations[bankOrGovBasic.indexOf(parseInt(bankInput.value))]
+        const annualGovScalar = 1 + govPerturbations[bankOrGovBasic.indexOf(parseInt(bankInput.value))]
+        let scalar = annualIntensityScalar * annualHouseholdScalar * annualFirmScalar * annualGovScalar * annualBankScalar
+        scalar = scalar / (index + 1) // with `index`, apply less influence each year.
+        if (currentGraphIsCorrelatedWithGoodEconomy) {
+          item = item * scalar
+        } else {
+          item = item / scalar
+        }
+        return item
+      })
+    }
+      
     dataToDisplay[activeRegion][activeTabId][activeHazard] = timeSeries
   })
   return dataToDisplay
+}
+
+function numbersMayBeNegative() {
+  const activeTabId = getActiveTabId()
+  return activeTabId.includes('growth') || activeTabId.includes('deficit')
 }
 
 // Applies datasets (pre-calculated) to the chart, and adds CIs to them
@@ -449,15 +486,20 @@ function getActiveRegions() {
 }
 
 function generateBound(data, lowerOrUpperBound) {
-  // TODO: do something much better than average because this can be v low or zero if negative numbers
-  const meanData = Math.abs(data.reduce((acc, cur) => Math.abs(acc) + Math.abs(cur))/data.length)
+  const meanData = absMean(data)
   if (lowerOrUpperBound === 'lower') {
     return data.map((d, i) => {
-      return i === 0 ? d : d - meanData * (1.0/((data.length-i)))
+      output = i === 0 ? d : d - meanData * (1.0/((data.length-i)))
+      return (numbersMayBeNegative() || output > 0) ? output : 0
     })
   } else if (lowerOrUpperBound === 'upper') {
     return data.map((d, i) => {
       return i === 0 ? d : d + meanData * (1.0/((data.length-i)))
     })
   }
+}
+
+// Average the absolute values, since otherwise, if the negs and pos's cancel out, the result can be 0 or near 0.
+function absMean(data) {
+  return Math.abs(data.reduce((acc, cur) => Math.abs(acc) + Math.abs(cur))/data.length)
 }

@@ -26,19 +26,13 @@
                 <option value="heatwave">Heatwave</option>
               </select>
             </div>
-            <div class="form-group mt-5">
+            <div class="form-group mt-5 mb-5">
               <label class="form-label fw-bold" for="intensity">Intensity</label>
               <input class="form-range" type="range" id="intensity" name="intensity" min="1" max="5" step="1" value="1">
               <p id="intensityReadout" class="text-center mb-0">placeholder-year event</p>
             </div>
-            <!-- backend: just use this number to multiply the data points? -->
-            <!-- 1: 5-year event -->
-            <!-- 2: 10-year event -->
-            <!-- 3: 20-year event -->
-            <!-- 4: 50-year event -->
-            <!-- 5: 100-year event -->
 
-            <div class="form-group mt-5">
+            <div class="form-group">
               <p id="warning" class="d-none">Please select at least one region.</p>
 
               <label class="form-label fw-bold" for="regions">Region(s)</label>
@@ -91,6 +85,7 @@
                 </label>
               </div>
             </div>
+            <!-- <img class="bangladesh mt-3 py-4 px-2" src="bangladesh.svg" alt="bangladesh map" /> -->
           </div>
         </div>
         <div class="col-9">
@@ -137,12 +132,14 @@
               <button class="nav-link" id="deficit-tab" data-bs-toggle="tab" data-bs-target="#deficit-tab-pane" type="button" role="tab" aria-controls="deficit-tab-pane" aria-selected="false">Budget deficit</button>
             </li>
           </ul>
-          <canvas id="myChart"></canvas>
+          <div class="chart-container" style="position: relative; height:55vh; width:70vw">
+            <canvas id="myChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
     
-    <script type="module" src="js/slidy.js"></script>
+    <script type="module" src="js/index.js"></script>
 
     <!-- <script type="module" src="dimensions.js"></script> -->
     <!-- <script type="module" src="acquisitions.js"></script> -->
