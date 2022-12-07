@@ -1,10 +1,17 @@
 {
   "name": "demo-tipping-frontier",
-  "engines": {
-    "node": "18.x"
-  },
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": ">=18.0"
+  },
+  "targets": {
+    "default": {
+      "engines": {
+        "browsers": ">= 50%"
+      }
+    }
+  },
   "scripts": {
     "build": "parcel build src/slidy.html",
     "test": "echo \"Error: no test specified\" && exit 1",
