@@ -13,7 +13,7 @@
     <div class="container-fluid">
       <h2 class="text-center mt-2">Scenario generator</h2>
       <div class="row mt-2 border-top">
-        <div class="col-3">
+        <div class="col-2">
           <div id="scenarios" class="rounded border mx-2 my-3 py-3 px-2 bg-teal">
             <h4>Scenario</h4>
             <div class="form-group">
@@ -26,7 +26,7 @@
                 <option value="heatwave">Heatwave</option>
               </select>
             </div>
-            <div class="form-group mt-5 mb-5">
+            <div class="form-group mt-5 mb-2">
               <label class="form-label fw-bold" for="intensity">Intensity</label>
               <input class="form-range" type="range" id="intensity" name="intensity" min="1" max="5" step="1" value="1">
               <p id="intensityReadout" class="text-center mb-0">placeholder-year event</p>
@@ -88,7 +88,7 @@
             <!-- <img class="bangladesh mt-3 py-4 px-2" src="bangladesh.svg" alt="bangladesh map" /> -->
           </div>
         </div>
-        <div class="col-9">
+        <div class="col-10">
           <div id="assumptions" class="rounded border my-3 py-3 px-2 bg-teal">
             <h4>Economic assumptions</h4>
             <form class="row">
@@ -132,7 +132,7 @@
               <button class="nav-link" id="deficit-tab" data-bs-toggle="tab" data-bs-target="#deficit-tab-pane" type="button" role="tab" aria-controls="deficit-tab-pane" aria-selected="false">Budget deficit</button>
             </li>
           </ul>
-          <div class="chart-container" style="position: relative; height:55vh; width:70vw">
+          <div class="chart-container" style="position: relative; height:55vh; width:80vw">
             <canvas id="myChart"></canvas>
           </div>
         </div>

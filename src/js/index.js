@@ -170,7 +170,6 @@ graphs.forEach((graph) => {
         timeSeries = timeSeries.map((absoluteDebt, i) => {
           const gdpAtThisTimeStep = gdpTimeSeries[i]
           const debtAsProportionOfGDP = (absoluteDebt/gdpAtThisTimeStep) * 100
-          console.log(absoluteDebt, debtAsProportionOfGDP)
           return debtAsProportionOfGDP
         })
       }
@@ -404,7 +403,6 @@ function getDataToDisplay() {
         const annualBankInfluence = bankPerturbations[bankOrGovBasic.indexOf(parseInt(bankInput.value))] * meanData
         const annualGovInfluence = govPerturbations[bankOrGovBasic.indexOf(parseInt(govInput.value))] * meanData
         const totalInfluence = annualIntensityInfluence + annualHouseholdInfluence + annualFirmInfluence + annualBankInfluence + annualGovInfluence
-
         if (currentGraphIsCorrelatedWithGoodEconomy) {
           item += ((index + 1) * totalInfluence)
         } else {
