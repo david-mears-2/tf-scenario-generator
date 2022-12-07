@@ -110,7 +110,7 @@ const graphs = [
   },
   { // Since this is expressed as a percent of GDP, to be internally consistent, I am writing
     // out the absolute debt figure, which we will later calculate as a percent of GDP.
-    title: 'Debt (% GDP)',
+    title: 'Debt to GDP (%)',
     id: 'debt',
     unit: '%',
     shape: [1, 1.2, 1.29, 1.33, 1.35, 1.34, 1.3, 1.28, 1.25, 1.24, 1.19]
@@ -462,7 +462,7 @@ function applyDatasetsToChart(dataDict) {
     } 
   })
   chart.data.datasets = datasets.flat()
-  chart.update()
+  chart.update('none')
 }
 
 function getActiveTabId() {
