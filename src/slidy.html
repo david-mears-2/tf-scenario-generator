@@ -28,8 +28,8 @@
             </div>
             <div class="form-group mt-5">
               <label class="form-label fw-bold" for="intensity">Intensity</label>
-              <p id="intensityReadout" class="text-center text-secondary mb-0">placeholder-year event</p>
               <input class="form-range" type="range" id="intensity" name="intensity" min="1" max="5" step="1" value="1">
+              <p id="intensityReadout" class="text-center mb-0">placeholder-year event</p>
             </div>
             <!-- backend: just use this number to multiply the data points? -->
             <!-- 1: 5-year event -->
@@ -39,6 +39,8 @@
             <!-- 5: 100-year event -->
 
             <div class="form-group mt-5">
+              <p id="warning" class="d-none">Please select at least one region.</p>
+
               <label class="form-label fw-bold" for="regions">Region(s)</label>
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" value="" id="Barishal">
@@ -97,70 +99,27 @@
             <form class="row">
               <div class="col form-group">
                 <label class="form-label fw-bold" for="household">Household (asset disposal)</label>
-                <select id="household" class="form-select">
-                  <option value="-35">35% fall</option>
-                  <option value="-30">30% fall</option>
-                  <option value="-25">25% fall</option>
-                  <option value="-20">20% fall</option>
-                  <option value="-15">15% fall</option>
-                  <option value="-10">10% fall</option>
-                  <option value="-5">5% fall</option>
-                  <option selected value="0">No increase</option>
-                  <option value="5">5% increase</option>
-                  <option value="10">10% increase</option>
-                  <option value="15">15% increase</option>
-                  <option value="20">20% increase</option>
-                  <option value="25">25% increase</option>
-                  <option value="30">30% increase</option>
-                  <option value="35">35% increase</option>
-                </select>
+                <input class="form-range" type="range" id="household" name="household" min="-35" max="35" step="5" value="0">
+                <p id="householdReadout" class="text-center mb-0">No increase</p>
               </div>
 
               <div class="col form-group">
-                <label class="form-label fw-bold" for="firm">Firm (investment)</label>
-                <select id="firm" class="form-select">
-                  <option value="-35">35% fall</option>
-                  <option value="-30">30% fall</option>
-                  <option value="-25">25% fall</option>
-                  <option value="-20">20% fall</option>
-                  <option value="-15">15% fall</option>
-                  <option value="-10">10% fall</option>
-                  <option value="-5">5% fall</option>
-                  <option selected value="0">No increase</option>
-                  <option value="5">5% increase</option>
-                  <option value="10">10% increase</option>
-                  <option value="15">15% increase</option>
-                  <option value="20">20% increase</option>
-                  <option value="25">25% increase</option>
-                  <option value="30">30% increase</option>
-                  <option value="35">35% increase</option>
-                </select>
+                <label class="form-label fw-bold" for="household">Firm (investment)</label>
+                <input class="form-range" type="range" id="firm" name="firm" min="-35" max="35" step="5" value="0">
+                <p id="firmReadout" class="text-center mb-0">No increase</p>
               </div>
 
               <div class="col form-group">
                 <label class="form-label fw-bold" for="bank">Monetary policy</label>
-                <select id="bank" class="form-select">
-                  <option value="-3">Very contractionary</option>
-                  <option value="-2">Contractionary</option>
-                  <option selected value="-1">Slightly contractionary</option>
-                  <option value="1">Slightly expansionary</option>
-                  <option value="2">Expansionary</option>
-                  <option value="3">Very expansionary</option>
-                </select>
+                <input class="form-range" type="range" id="bank" name="bank" min="-3" max="3" step="1" value="0">
+                <p id="bankReadout" class="text-center mb-0">No change</p>
               </div>
 
               <div class="col form-group">
                 <label class="form-label fw-bold" for="gov">Fiscal policy</label>
-                <select id="gov" class="form-select">
-                  <option value="-3">Very contractionary</option>
-                  <option value="-2">Contractionary</option>
-                  <option selected value="-1">Slightly contractionary</option>
-                  <option value="1">Slightly expansionary</option>
-                  <option value="2">Expansionary</option>
-                  <option value="3">Very expansionary</option>
-                </select>
+                <input class="form-range" type="range" id="gov" name="gov" min="-3" max="3" step="1" value="0">
+                <p id="govReadout" class="text-center mb-0">No change</p>
               </div>
-              
             </form>
           </div>
 
@@ -177,7 +136,7 @@
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="deficit-tab" data-bs-toggle="tab" data-bs-target="#deficit-tab-pane" type="button" role="tab" aria-controls="deficit-tab-pane" aria-selected="false">Budget deficit</button>
             </li>
-          </ul>          
+          </ul>
           <canvas id="myChart"></canvas>
         </div>
       </div>

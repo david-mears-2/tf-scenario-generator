@@ -2,96 +2,95 @@
 import { Chart } from 'chart.js/auto'
 
 const navBar = document.getElementById('myTab')
+const hazardInput = document.getElementById('hazard')
 
 const bangladeshPop = 165000000
 const bangladeshGDP2022 = 0.461 // Trillion dollars
 const bangladeshDebt2020 = 0.14548 // Trillion dollars
 const bangladeshDeficit2021 = 0.015008 // Trillion dollars
+const hazards = ['cyclone', 'drought', 'flood', 'wildfire', 'heatwave']
 const regions = [
   {
     name: 'Barishal',
+    color: 'rgb(54, 162, 235)',
     startingValues: {
       gdp: (8331000/bangladeshPop) * bangladeshGDP2022, // proportional to population
       growth: -2.5,
-      debt: (((8331000/bangladeshPop) * bangladeshDebt2020) / ((8331000/bangladeshPop) * bangladeshGDP2022)) * 100, // percent of gdp
+      debt: ((8331000/bangladeshPop) * bangladeshDebt2020), // expressed in absolute terms here
       deficit: (8331000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Chattogram',
+    color: 'rgb(255, 99, 132)',
     startingValues: {
       gdp: (28136000/bangladeshPop) * bangladeshGDP2022,
       growth: -2.75,
-      debt: (((28136000/bangladeshPop) * bangladeshDebt2020) / ((28136000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((28136000/bangladeshPop) * bangladeshDebt2020),
       deficit: (28136000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Dhaka',
+    color: 'rgb(75, 192, 192)',
     startingValues: {
       gdp: (39675000/bangladeshPop) * bangladeshGDP2022,
       growth: -3.5,
-      debt: (((39675000/bangladeshPop) * bangladeshDebt2020) / ((39675000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((39675000/bangladeshPop) * bangladeshDebt2020),
       deficit: (39675000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Khulna',
+    color: 'rgb(255, 159, 64)',
     startingValues: {
       gdp: (14873000/bangladeshPop) * bangladeshGDP2022,
       growth: -4.6,
-      debt: (((14873000/bangladeshPop) * bangladeshDebt2020) / ((14873000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((14873000/bangladeshPop) * bangladeshDebt2020),
       deficit: (14873000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Mymensingh',
+    color: 'rgb(153, 102, 255)',
     startingValues: {
       gdp: (11362000/bangladeshPop) * bangladeshGDP2022,
       growth: -1.75,
-      debt: (((11362000/bangladeshPop) * bangladeshDebt2020) / ((11362000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((11362000/bangladeshPop) * bangladeshDebt2020),
       deficit: (11362000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Rajshahi',
+    color: 'rgb(255, 205, 86)',
     startingValues: {
       gdp: (18506000/bangladeshPop) * bangladeshGDP2022,
       growth: -3.1,
-      debt: (((18506000/bangladeshPop) * bangladeshDebt2020) / ((18506000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((18506000/bangladeshPop) * bangladeshDebt2020),
       deficit: (18506000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Rangpur',
+    color: 'rgb(201, 203, 207)',
     startingValues: {
       gdp: (15805000/bangladeshPop) * bangladeshGDP2022,
       growth: -2.7,
-      debt: (((15805000/bangladeshPop) * bangladeshDebt2020) / ((15805000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((15805000/bangladeshPop) * bangladeshDebt2020),
       deficit: (15805000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
   {
     name: 'Sylhet',
+    color: 'rgb(150, 75, 0)',
     startingValues: {
       gdp: (9798000/bangladeshPop) * bangladeshGDP2022,
       growth: -6,
-      debt: (((9798000/bangladeshPop) * bangladeshDebt2020) / ((9798000/bangladeshPop) * bangladeshGDP2022)) * 100,
+      debt: ((9798000/bangladeshPop) * bangladeshDebt2020),
       deficit: (9798000/bangladeshPop) * bangladeshDeficit2021,
     }
   },
 ]
-
-// displayedDataDict: A dictionary tracking which data should currently be displayed. The time series are associated with regions, so we
-// need to remember which region it was so we can remove that region's data from the dict. The same is true
-// for the four outputs: we need to remember which is active.
-// Same structure as dataSource (though only one output can be present at once):
-// dataSource: {
-//   oxfordshire: {
-//     gdp: [0, 1, 2, etc]
-//   }
-// }
-let displayedDataDict = {}
 
 // Generic info about graphs. The 'shape' numbers are factors by which to multiply things in order to create a certain shape of graph in
 // way that is agnostic of the initial value (which is represented by '1'). These curves should be relatively gentle, so that
@@ -136,67 +135,66 @@ const graphs = [
 // Monetary policy: higher number means inverse of intensity
 // Fiscal policy: higher number means inverse of intensity
 
-
-
 // dataSource: {
 //   oxfordshire: {
-//     gdp: [0, 1, 2, etc]
+//     gdp: {
+//       cyclone: [0, 1, 2, etc],
+//     }
 //   }
 // }
 let dataSource = {}
+// Cycle through graphs before regions, since (eventually) Debt values will depend on earlier GDP values
 graphs.forEach((graph) => {
   regions.forEach((region) => {
-    startingValue = region.startingValues[graph.id]
+    
     if (dataSource[region.name] === undefined) {
       dataSource[region.name] = {}
     }
-    // Multiply each step in the shape time series by the starting value
-    timeSeries = graph.shape.map((item) => item * startingValue)
-    dataSource[region.name][graph.id] = timeSeries
-    // TODO: add in some randomization so that regions have slightly different shapes from each other
-    // TODO: If the graph in q is debt, we now need to convert the absolute debt into a percent of GDP
+    if (dataSource[region.name][graph.id] === undefined) {
+      dataSource[region.name][graph.id] = {}
+    }
+
+    hazards.forEach((hazard) => {
+      if (dataSource[region.name][graph.id][hazard] === undefined) {
+        dataSource[region.name][graph.id][hazard] = {}
+      }
+      // Read a starting value and add in some randomization so that regions/hazards have slightly different starts from each other
+      const startingValue = perturb(region.startingValues[graph.id])
+      // Scale each step in the 'graph shape' time series by the starting value
+      // Add in some randomization so that regions/hazards have slightly different shapes from each other
+      timeSeries = graph.shape.map((item) => perturb(item * startingValue))
+      // TODO: the random noise should include some 'memory' of the previous item, to be more realistic.
+      dataSource[region.name][graph.id][hazard] = timeSeries
+      // TODO: If the graph in q is debt, we now need to convert the absolute debt into a percent of GDP
+    })
   })
 })
+
+function perturb(num) {
+  return getRandomFloat(0.6, 1.4, 2) * num
+}
+function getRandomFloat(min, max, decimals) {
+  const str = (Math.random() * (max - min) + min).toFixed(decimals);
+
+  return parseFloat(str);
+}
 
 const tabs = graphs.map(graph => document.getElementById(`${graph['id']}-tab`))
 tabs.forEach((tab) => {
   tab.addEventListener('click', function() {
+    // Update UI of tabs
     tabs.forEach((tab) => tab.classList.remove('active'))
     tab.classList.add('active')
     const graph = graphs.filter((graph) => `${graph['id']}-tab` === tab.id)[0]
+    // Update chart axes' labels and (undisplayed) chart title
     chart.options.plugins.title.text = graph['title']
     chart.options.scales.y.title.text = graph['title']
-    chart.options.scales.y.ticks.callback = function(value, index, ticks) {
+    chart.options.scales.y.ticks.callback = function(value, _index, _ticks) {
       return value + graph['unit']
     },
-    changeAllData([{
-      label: graph['title'],
-      data: [0, 19, 3, 5, 2, 3, 7, 2, 8, 3, 7, 12],
-      borderWidth: 1,
-    }])
+    refreshChart()
   })
 })
-
-function addData(chart, datasets) {
-  chart.data.datasets = datasets;
-  // chart.data.datasets.forEach((dataset))
-  chart.update()
-}
-
-function removeAllData(chart) {
-  chart.data.datasets = []
-  chart.update()
-}
-
-function changeAllData(datasets) {
-  removeAllData(chart)
-  addData(chart, datasets)
-}
-
-function exampleChange() {
-  let data = [1, 2, 3, 2, 1, 3]
-  changeAllData([{label: 'likes', data: data, borderWidth: 1}])
-}
 
 // function removeData(chart) {
 //   chart.data.labels.pop();
@@ -221,15 +219,16 @@ function exampleChange() {
 //   borderWidth: 1
 // }
 
+const years = ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032']
 Chart.defaults.elements.line.tension = 0.1;
 
 var config = {
   type: 'line',
   data: {
-    labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032'],
+    labels: years,
     datasets: [{
       label: graphs[0]['title'],
-      data: [12, 19, 3, 5, 2, 3, 7, 2, 8, 3, 7, 12],
+      data: [],
       borderWidth: 1,
     }]
   },
@@ -263,15 +262,24 @@ var config = {
   }
 };
 
-
-
-
-
 const ctx = document.getElementById('myChart');
 const chart = new Chart(ctx, config);
 
+
+
+
 const intensityReadout = document.getElementById('intensityReadout')
 const intensityInput = document.getElementById('intensity')
+const householdReadout = document.getElementById('householdReadout')
+const householdInput = document.getElementById('household')
+const firmReadout = document.getElementById('firmReadout')
+const firmInput = document.getElementById('firm')
+const bankReadout = document.getElementById('bankReadout')
+const bankInput = document.getElementById('bank')
+const govReadout = document.getElementById('govReadout')
+const govInput = document.getElementById('gov')
+
+
 const intensities = {
   "1": "5",
   "2": "10",
@@ -279,62 +287,145 @@ const intensities = {
   "4": "50",
   "5": "100"
 }
+const policies = {
+  "-3": "Very contractionary",
+  "-2": "Contractionary",
+  "-1": "Slightly contractionary",
+  "0": "No change",
+  "1": "Slightly expansionary",
+  "2": "Expansionary",
+  "3": "Very expansionary"
+}
 window.onload = () => {
   intensityReadout.innerText = `${intensities[intensityInput.value]}-year event`
+  updateHouseholdReadout(householdInput.value)
+  updateFirmReadout(firmInput.value)
+  updateBankReadout(bankInput.value)
+  updateGovReadout(govInput.value)
+  refreshChart()
 };
-intensityInput.addEventListener('click', function() {
+intensityInput.addEventListener('change', function() {
   intensityReadout.innerText = `${intensities[this.value]}-year event`
+  refreshChart()
 });
+
+bankInput.addEventListener('change', function() {
+  updateBankReadout(this.value)
+  refreshChart()
+});
+function updateBankReadout(value) {
+  bankReadout.innerText = policies[value]
+}
+govInput.addEventListener('change', function() {
+  updateGovReadout(this.value)
+  refreshChart()
+});
+function updateGovReadout(value) {
+  govReadout.innerText = policies[value]
+}
+
 
 const regionInputs = regions.map((region) => {
   return document.getElementById(region.name)
 })
 regionInputs.forEach((el) => {
-  const activeTabId = getActiveTabId()
   el.addEventListener('click', function() {
-    if (displayedDataDict[this.id] === undefined) {displayedDataDict[this.id] = {}}
-    // If the input is now checked, add the data to the graph
-    if (this.checked) {
-      let timeSeries = dataSource[this.id][activeTabId]
-      // Scale the data by the intensity factor
-      // Actually, that should happen inside a shared function, since it needs to be
-      // called when we click on ANY input.
-      const intensity = getCurrentIntensity()
-      timeSeries = timeSeries.map((item) => item * intensity)
-
-      displayedDataDict[this.id][activeTabId] = timeSeries
-      
-      
-      // TODO: we need to make sure it's scaled by intensity etc
-    } else if (displayedDataDict[this.id][activeTabId]){ // Else remove it if it exists.
-      delete displayedDataDict[this.id][activeTabId];
-    }
-    updateData(displayedDataDict)
+    refreshChart()
   })
 })
 
-function getCurrentIntensity() {
-  return intensityInput.value
+
+householdInput.addEventListener('change', function() {
+  updateHouseholdReadout(this.value)
+  refreshChart()
+});
+function updateHouseholdReadout(value) {
+  value = parseInt(value)
+  if (value === 0) {
+    householdReadout.innerText = 'No increase'
+  } else {
+    const fallOrIncrease = value > 0 ? 'increase' : 'fall'
+    householdReadout.innerText = `${Math.abs(value)}% ${fallOrIncrease}`
+  }
 }
 
-function updateData(dataDict) {
+firmInput.addEventListener('change', function() {
+  updateFirmReadout(this.value)
+  refreshChart()
+});
+function updateFirmReadout(value) {
+  value = parseInt(value)
+  if (value === 0) {
+    firmReadout.innerText = 'No increase'
+  } else {
+    const fallOrIncrease = value > 0 ? 'increase' : 'fall'
+    firmReadout.innerText = `${Math.abs(value)}% ${fallOrIncrease}`
+  }
+}
+
+hazardInput.addEventListener('change', function() {
+  refreshChart()
+});
+
+function refreshChart() {
+  applyDatasetsToChart(getDataToDisplay())
+}
+
+function getDataToDisplay() {
+  // Initialize empty data object
+  let dataToDisplay = {}
+  // check which output to display
   const activeTabId = getActiveTabId()
+  // check which hazard
+  const activeHazard = getActiveHazard()
+  // check which regions to display
+  const activeRegions = getActiveRegions()
+  // add them all to the graph
+  activeRegions.forEach((activeRegion) => {
+    if (dataToDisplay[activeRegion] === undefined) {
+      dataToDisplay[activeRegion] = {}
+    }
+    if (dataToDisplay[activeRegion][activeTabId] === undefined) {
+      dataToDisplay[activeRegion][activeTabId] = {}
+    }
+    let timeSeries = dataSource[activeRegion][activeTabId][activeHazard]
+    // Scale the data by the intensity factor
+    // Actually, that should happen inside a shared function, since it needs to be
+    // called when we click on ANY input.
+    const intensity = intensityInput.value
+    timeSeries = timeSeries.map((item, i) => {
+      // apply intensity factor more in earlier years than later
+      return item * (intensity/(i+1))
+    })
+      // scale by other things
+
+
+    dataToDisplay[activeRegion][activeTabId][activeHazard] = timeSeries
+  })
+  return dataToDisplay
+}
+
+// Applies datasets (pre-calculated) to the chart, and adds CIs to them
+function applyDatasetsToChart(dataDict) {
+  const activeTabId = getActiveTabId()
+  const activeHazard = getActiveHazard()
   let regionsToDisplay = Object.keys(dataDict)
-  let datasets = regionsToDisplay.map((region) => {
-    newData = dataDict[region][activeTabId]
+  let datasets = regionsToDisplay.map((region, i) => {
+    newData = dataDict[region][activeTabId][activeHazard]
     if (newData === undefined) {
       return {}
     } else {
-      const color = 'rgb(54, 162, 235)' // TODO: vary colors
+      const color = regions.filter((r) => r.name === region)[0].color
       const transparentColor = color.slice(0,-1) + ', 0.3)'
       return [
         {label: region, data: newData, borderWidth: 1, backgroundColor: color, borderColor: color},
-        {label: `${region}: 95% CI upper bound`, data: generateBound(newData, 'upper'), borderWidth: 1, backgroundColor: transparentColor, pointRadius: 0, fill: 2}, // "Fill to dataset 2"
+        {label: `${region}: 95% CI upper bound`, data: generateBound(newData, 'upper'), borderWidth: 1, backgroundColor: transparentColor, pointRadius: 0, fill: (3*i)+2}, // "Fill the color up until dataset N": 2, 5, 8, 11, etc
         {label: `${region}: 95% CI lower bound`, data: generateBound(newData, 'lower'), borderWidth: 1, pointRadius: 0}
       ]
     } 
   })
-  changeAllData(datasets.flat())
+  chart.data.datasets = datasets.flat()
+  chart.update()
 }
 
 function getActiveTabId() {
@@ -342,8 +433,22 @@ function getActiveTabId() {
     .filter((button) => button.className.includes('active'))[0].id.replace('-tab', '')
 }
 
+function getActiveHazard() {
+  return hazardInput.value
+}
+
+const noRegionsTip = document.getElementById('warning')
+function getActiveRegions() {
+  const activeRegions = regionInputs.filter((input) => input.checked).map((input) => input.id)
+  if (activeRegions.length === 0) {
+    noRegionsTip.className = "visible text-danger"
+  } else {
+    noRegionsTip.className = "invisible"
+  }
+  return activeRegions
+}
+
 function generateBound(data, lowerOrUpperBound) {
-  console.log(data)
   // TODO: do something much better than average because this can be v low or zero if negative numbers
   const meanData = Math.abs(data.reduce((acc, cur) => Math.abs(acc) + Math.abs(cur))/data.length)
   if (lowerOrUpperBound === 'lower') {
@@ -356,16 +461,3 @@ function generateBound(data, lowerOrUpperBound) {
     })
   }
 }
-
-document.getElementById('household').onchange = function() {
-  const newData = [parseInt(this.value), 2, 3, 4, 5, 6, 7, 8, 3, 0]
-  const color = 'rgb(54, 162, 235)'
-  const transparentColor = color.slice(0,-1) + ', 0.3)'
-  changeAllData(
-    [
-      {label: 'likes', data: newData, borderWidth: 1, backgroundColor: 'rgb(54, 162, 235)', borderColor: 'rgb(54, 162, 235)'},
-      {label: '95% CI upper bound', data: generateBound(newData, 'upper'), borderWidth: 0, backgroundColor: transparentColor, pointRadius: 0, fill: 2}, // "Fill to dataset 2"
-      {label: '95% CI lower bound', data: generateBound(newData, 'lower'), borderWidth: 0, pointRadius: 0},
-    ]
-  )
-};
