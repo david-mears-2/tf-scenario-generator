@@ -457,10 +457,10 @@ function applyDatasetsToChart(dataDict) {
         {label: `${region}: 95% CI upper bound`, data: generateBound(newData, 'upper'), borderWidth: 1, backgroundColor: transparentColor, pointRadius: 0, fill: (3*i)+2}, // "Fill the color up until dataset N": 2, 5, 8, 11, etc
         {label: `${region}: 95% CI lower bound`, data: generateBound(newData, 'lower'), borderWidth: 1, pointRadius: 0}
       ]
-    } 
+    }
   })
   chart.data.datasets = datasets.flat()
-  chart.update('none')
+  chart.update
 }
 
 function getActiveTabId() {
